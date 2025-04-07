@@ -1,16 +1,22 @@
 <?php
 require_once 'config.php';
 
-// Check if all puzzles were completed
-$allPuzzlesSolved = count($_SESSION['completed_puzzles'] ?? []) >= TOTAL_PUZZLES;
-$timeLeft = TOTAL_TIME - (time() - $_SESSION['game_started']);
+// Store variables for display before clearing session
+$hints_used = isset($_SESSION['hints_used']) ? $_SESSION['hints_used'] : 0;
+$completed_puzzles = count($_SESSION['completed_puzzles'] ?? []);
+$timeLeft = isset($_SESSION['game_started']) ? TOTAL_TIME - (time() - $_SESSION['game_started']) : 0;
 
-// Determine game outcome
+// Check if all puzzles were completed
+$allPuzzlesSolved = $completed_puzzles >= TOTAL_PUZZLES;
+
 $success = $allPuzzlesSolved && $timeLeft > 0;
 
-// Reset game session
-session_unset();
-session_destroy();
+// Reset game session ONLY AFTER capturing necessary data
+if (isset($_POST['reset_session'])) {
+    session_unset();
+    session_destroy();
+    session_start();
+}
 
 require_once 'header.php';
 ?>
@@ -21,7 +27,7 @@ require_once 'header.php';
             <div class="text-6xl mb-4 animate-bounce">🎉</div>
             <h2 class="text-4xl font-bold text-green-300 mb-4">Congratulations!</h2>
             <p class="text-xl mb-2">You escaped with <?php echo gmdate("i:s", $timeLeft); ?> remaining!</p>
-            <p class="text-lg">Hints used: <?php echo $_SESSION['hints_used'] ?? 0; ?>/<?php echo MAX_HINTS; ?></p>
+            <p class="text-lg">Hints used: <?php echo $hints_used; ?>/<?php echo MAX_HINTS; ?></p>
         </div>
     <?php else: ?>
         <div class="bg-red-900 border-2 border-red-400 rounded-lg p-8 mb-8 transform transition-all duration-500 hover:scale-105">
@@ -51,7 +57,7 @@ require_once 'header.php';
             </li>
             <li class="flex justify-between">
                 <span>Hints Used:</span>
-                <span><?php echo $_SESSION['hints_used'] ?? 0; ?>/<?php echo MAX_HINTS; ?></span>
+                <span><?php echo $hints_used; ?>/<?php echo MAX_HINTS; ?></span>
             </li>
         </ul>
     </div>

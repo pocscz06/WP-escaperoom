@@ -37,7 +37,7 @@ require_once 'header.php';
         </h2>
         
         <div class="mb-8">
-            <p class="text-lg mb-4">What comes next in this sequence?</p>
+            <p class="text-lg mb-4">What shape results from this sequence?</p>
             <div class="bg-black p-6 rounded text-center text-2xl font-mono mb-6">
                 <div class="flex justify-center space-x-8 mb-4">
                     <div class="w-16 h-16 border-b-4 border-l-4 border-r-4 border-white transform rotate-45"></div>

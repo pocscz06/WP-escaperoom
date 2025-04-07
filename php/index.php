@@ -1,5 +1,16 @@
 <?php
 require_once 'config.php';
+
+if (isset($_POST['reset_game'])) { // Completely clears session when "reset" button is pressed
+    session_unset();
+    session_destroy();
+    
+    session_start();
+    
+    header("Location: index.php");
+    exit;
+}
+
 require_once 'header.php';
 ?>
 
@@ -16,13 +27,27 @@ require_once 'header.php';
             <li>Progress is saved automatically</li>
         </ul>
         
-        <form action="puzzle1.php" method="post">
-            <button type="submit" 
-                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full text-lg
-                           transition duration-300 transform hover:scale-105">
-                <i class="fas fa-door-open mr-2"></i> Start Challenge
-            </button>
-        </form>
+        <div class="flex justify-center space-x-4">
+            <form action="puzzle1.php" method="post">
+                <input type="hidden" name="start_game" value="1">
+                <button type="submit" 
+                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full text-lg
+                               transition duration-300 transform hover:scale-105">
+                    <i class="fas fa-door-open mr-2"></i> Start Challenge
+                </button>
+            </form>
+            
+            <?php if (isset($_SESSION['game_started'])): ?>
+            <form method="post">
+                <button type="submit" 
+                        name="reset_game"
+                        class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-8 rounded-full text-lg
+                               transition duration-300 transform hover:scale-105">
+                    <i class="fas fa-redo-alt mr-2"></i> Reset Game
+                </button>
+            </form>
+            <?php endif; ?>
+        </div>
     </div>
     
     <div class="bg-gray-700 p-6 rounded-lg">

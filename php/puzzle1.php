@@ -10,7 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && basename($_SERVER['HTTP_REFERER']) 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_answer'])) {
     $answer = strtolower(trim($_POST['answer']));
-    if ($answer === 'key') {
+
+    // Basic flexible validation: Accept if it contains both 'key' and 'something'
+    if (strpos($answer, 'key') !== false && strpos($answer, 'something') !== false) {
         $_SESSION['completed_puzzles'][] = 1;
         $_SESSION['current_puzzle'] = 2;
         header('Location: puzzle2.php');

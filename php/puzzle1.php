@@ -2,7 +2,11 @@
 require_once 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['start_game'])) {
+    $_SESSION['game_started'] = time();
     $_SESSION['current_puzzle'] = 1;
+
+    header("Location: puzzle1.php");
+    exit;
 }
 
 if (!isset($_SESSION['game_started'])) {

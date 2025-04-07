@@ -21,7 +21,11 @@
 <body class="min-h-screen flex flex-col">
     <header class="bg-gray-800 p-4 shadow-lg">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-red-500">ESCAPE ROOM</h1>
+            <a href="index.php" class="text-2xl font-bold text-red-500 hover:text-red-400 transition-colors duration-300">
+                <h1 class="flex items-center">
+                    <i class="fas fa-key mr-2"></i> ESCAPE ROOM
+                </h1>
+            </a>
             <div class="timer bg-black p-2 rounded-lg text-red-500 text-xl">
                 <?php
                 if (isset($_SESSION['game_started'])) {

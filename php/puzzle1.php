@@ -52,26 +52,6 @@ $error = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['use_hint']) && $_SESSION['hints_used'] < MAX_HINTS) {
-    $user_progress = [];
-    for ($i = 0; $i < 9; $i++) {
-        $row = [];
-        for ($j = 0; $j < 9; $j++) {
-            $cell_key = "cell_{$i}_{$j}";
-            if (isset($_POST[$cell_key]) && !empty($_POST[$cell_key])) {
-                $row[] = (int)$_POST[$cell_key];
-            } else {
-                if ($_SESSION['sudoku_grid'][$i][$j] !== 0) {
-                    $row[] = $_SESSION['sudoku_grid'][$i][$j];
-                } else {
-                    $row[] = 0; 
-                }
-            }
-        }
-        $user_progress[] = $row;
-    }
-    
-    $_SESSION['user_progress'] = $user_progress;
-    
     $_SESSION['hints_used']++;
     $hintUsed = true;
     
@@ -80,8 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['use_hint']) && $_SESS
         for ($j = 0; $j < 9; $j++) {
             $key = "{$i}_{$j}";
             if ($_SESSION['sudoku_grid'][$i][$j] === 0 && 
-                !in_array($key, $_SESSION['sudoku_hints_revealed']) && 
-                $user_progress[$i][$j] === 0) {
+                !in_array($key, $_SESSION['sudoku_hints_revealed'] ?? [])) {
                 $empty_cells[] = $key;
             }
         }
@@ -93,9 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['use_hint']) && $_SESS
         list($row, $col) = explode('_', $cell_to_reveal);
         
         $_SESSION['sudoku_grid'][$row][$col] = $_SESSION['sudoku_solution'][$row][$col];
-        
-        $_SESSION['user_progress'][$row][$col] = $_SESSION['sudoku_solution'][$row][$col];
-        
         $_SESSION['sudoku_hints_revealed'][] = $cell_to_reveal;
     }
 }
@@ -136,11 +112,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_answer']))
     } elseif (!$all_filled) {
         $error = 'Please fill in all cells before submitting.';
     }
-    
-    $_SESSION['user_progress'] = $submitted_grid;
-}
-else {
-    $hintUsed = false;
 }
 
 require_once 'header.php';
@@ -169,19 +140,10 @@ require_once 'header.php';
                             <tr class="sudoku-row">
                                 <?php for ($j = 0; $j < 9; $j++): ?>
                                     <?php 
-                                        $display_value = isset($_SESSION['user_progress'][$i][$j]) && 
-                                                      $_SESSION['user_progress'][$i][$j] !== 0 
-                                                      ? $_SESSION['user_progress'][$i][$j] 
-                                                      : $_SESSION['sudoku_grid'][$i][$j];
-                                        
-                                        $is_original = $_SESSION['sudoku_grid'][$i][$j] !== 0 && 
-                                                      !in_array("{$i}_{$j}", $_SESSION['sudoku_hints_revealed'] ?? []);
-                                        
-                                        $is_hint = in_array("{$i}_{$j}", $_SESSION['sudoku_hints_revealed'] ?? []);
-                                        
+                                        $display_value = $_SESSION['sudoku_grid'][$i][$j];
+                                        $is_original = $_SESSION['sudoku_grid'][$i][$j] !== 0;
                                         $cell_class = "sudoku-cell";
                                         if ($is_original) $cell_class .= " original";
-                                        if ($is_hint) $cell_class .= " hint";
                                     ?>
                                     <td>
                                         <input 
@@ -192,7 +154,7 @@ require_once 'header.php';
                                             pattern="[1-9]"
                                             inputmode="numeric"
                                             class="<?php echo $cell_class; ?>"
-                                            <?php echo ($is_original || $is_hint) ? 'readonly' : ''; ?>
+                                            <?php echo $is_original ? 'readonly' : ''; ?>
                                             oninput="this.value=this.value.replace(/[^1-9]/g,'')"
                                         >
                                     </td>
@@ -216,23 +178,6 @@ require_once 'header.php';
                     <?php endif; ?>
                 </div>
             </form>
-        </div>
-        
-        <?php if ($hintUsed): ?>
-            <div class="bg-blue-900 p-4 rounded-lg border border-blue-400 mt-4 animate-pulse">
-                <h3 class="font-bold text-blue-300 mb-2"><i class="fas fa-info-circle mr-2"></i>Hint:</h3>
-                <p>A number has been revealed on the grid! Look for the highlighted cell in blue.</p>
-            </div>
-        <?php endif; ?>
-    
-        <div class="mt-6 bg-gray-800 p-4 rounded-lg">
-            <h3 class="text-lg font-semibold mb-3 text-blue-400">Sudoku Rules:</h3>
-            <ul class="list-disc pl-4 space-y-2 text-sm">
-                <li>Fill in the grid so that every row contains the numbers 1-9</li>
-                <li>Every column must contain the numbers 1-9</li>
-                <li>Each of the nine 3×3 boxes must contain the numbers 1-9</li>
-                <li>No number can appear more than once in any row, column, or 3×3 box</li>
-            </ul>
         </div>
     </div>
 </div>

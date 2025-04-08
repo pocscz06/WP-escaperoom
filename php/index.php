@@ -1,9 +1,20 @@
 <?php
 require_once 'config.php';
+require_once 'cookie_helper.php';
 
-if (isset($_POST['reset_game'])) { // Completely clears session when "reset" button is pressed
+// Check if progress exists in cookies
+$saved_progress_exists = false;
+$saved_progress = load_progress_from_cookie();
+if ($saved_progress) {
+    $_SESSION = $saved_progress;
+    $saved_progress_exists = true;
+}
+
+// Reset the game when the "Reset Game" button is pressed
+if (isset($_POST['reset_game'])) {
     session_unset();
     session_destroy();
+    clear_progress_cookie();
     
     session_start();
     
@@ -20,6 +31,7 @@ require_once 'header.php';
     <div class="bg-gray-700 p-8 rounded-lg shadow-lg mb-8">
         <p class="text-lg mb-4">You're locked in a virtual room with <?php echo TOTAL_PUZZLES; ?> puzzles to solve.</p>
         <p class="text-lg mb-6">You have <span class="text-red-400 font-bold"><?php echo gmdate("i:s", TOTAL_TIME); ?></span> to escape!</p>
+        <p class="text-lg mb-6">Hints remaining: <span class="text-yellow-400 font-bold"><?php echo MAX_HINTS - ($_SESSION['hints_used'] ?? 0); ?></span></p>
         
         <ul class="text-left list-disc pl-6 mb-8 space-y-2">
             <li>Solve all puzzles before time runs out</li>
@@ -28,16 +40,29 @@ require_once 'header.php';
         </ul>
         
         <div class="flex justify-center space-x-4">
-            <form action="puzzle1.php" method="post">
-                <input type="hidden" name="start_game" value="1">
-                <button type="submit" 
-                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full text-lg
-                               transition duration-300 transform hover:scale-105">
-                    <i class="fas fa-door-open mr-2"></i> Start Challenge
-                </button>
-            </form>
+            <?php if ($saved_progress_exists): ?>
+                <!-- Resume Challenge Button -->
+                <form action="puzzle<?php echo isset($_SESSION['current_puzzle']) ? $_SESSION['current_puzzle'] : 1; ?>.php" method="post">
+                    <input type="hidden" name="resume_game" value="1">
+                    <button type="submit" 
+                            class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full text-lg
+                                   transition duration-300 transform hover:scale-105">
+                        <i class="fas fa-door-open mr-2"></i> Resume Challenge
+                    </button>
+                </form>
+            <?php else: ?>
+                <!-- Start Challenge Button -->
+                <form action="puzzle1.php" method="post">
+                    <input type="hidden" name="start_game" value="1">
+                    <button type="submit" 
+                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full text-lg
+                                   transition duration-300 transform hover:scale-105">
+                        <i class="fas fa-play mr-2"></i> Start Challenge
+                    </button>
+                </form>
+            <?php endif; ?>
             
-            <?php if (isset($_SESSION['game_started'])): ?>
+            <!-- Reset Game Button -->
             <form method="post">
                 <button type="submit" 
                         name="reset_game"
@@ -46,7 +71,6 @@ require_once 'header.php';
                     <i class="fas fa-redo-alt mr-2"></i> Reset Game
                 </button>
             </form>
-            <?php endif; ?>
         </div>
     </div>
     

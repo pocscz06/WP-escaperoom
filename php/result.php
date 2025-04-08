@@ -11,6 +11,9 @@ $allPuzzlesSolved = $completed_puzzles >= TOTAL_PUZZLES;
 
 $success = $allPuzzlesSolved && $timeLeft > 0;
 
+// Calculate final score
+$score = max(0, 100 - ($hints_used * 10)); // Deduct 10 points per hint used
+
 // Reset game session ONLY AFTER capturing necessary data
 if (isset($_POST['reset_session'])) {
     session_unset();
@@ -28,6 +31,7 @@ require_once 'header.php';
             <h2 class="text-4xl font-bold text-green-300 mb-4">Congratulations!</h2>
             <p class="text-xl mb-2">You escaped with <?php echo gmdate("i:s", $timeLeft); ?> remaining!</p>
             <p class="text-lg">Hints used: <?php echo $hints_used; ?>/<?php echo MAX_HINTS; ?></p>
+            <p class="text-lg font-bold">Final Score: <?php echo $score; ?></p>
         </div>
     <?php else: ?>
         <div class="bg-red-900 border-2 border-red-400 rounded-lg p-8 mb-8 transform transition-all duration-500 hover:scale-105">
@@ -41,6 +45,7 @@ require_once 'header.php';
                     All puzzles solved, but too slowly!
                 <?php endif; ?>
             </p>
+            <p class="text-lg font-bold">Final Score: <?php echo $score; ?></p>
         </div>
     <?php endif; ?>
 
@@ -58,6 +63,10 @@ require_once 'header.php';
             <li class="flex justify-between">
                 <span>Hints Used:</span>
                 <span><?php echo $hints_used; ?>/<?php echo MAX_HINTS; ?></span>
+            </li>
+            <li class="flex justify-between">
+                <span>Final Score:</span>
+                <span><?php echo $score; ?></span>
             </li>
         </ul>
     </div>

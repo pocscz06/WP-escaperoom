@@ -47,3 +47,9 @@
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+.hint-message {
+  color: #f56565; /* Tailwind's red-500 */
+  font-weight: bold;
+  margin-bottom: 16px;
+}

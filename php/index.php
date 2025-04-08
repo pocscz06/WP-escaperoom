@@ -1,4 +1,7 @@
 <?php
+require_once 'auth.php';
+require_login(); // Redirects to login.php if the user is not logged in
+
 require_once 'config.php';
 require_once 'cookie_helper.php';
 
@@ -6,7 +9,7 @@ require_once 'cookie_helper.php';
 $saved_progress_exists = false;
 $saved_progress = load_progress_from_cookie();
 if ($saved_progress) {
-    $_SESSION = $saved_progress;
+    $_SESSION = array_merge($_SESSION, $saved_progress); // Merge progress into the session
     $saved_progress_exists = true;
 }
 
